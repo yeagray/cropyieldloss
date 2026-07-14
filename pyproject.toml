@@ -1,0 +1,13 @@
+[tool.ruff]
+# Strict PEP 8 maximum line length for standard Python code
+line-length = 79
+
+[tool.ruff.format]
+# Enforce uniform line endings and quotes where possible
+quote-style = "double"
+
+[tool.docformatter]
+# Strict PEP 8 limits for flowing comments and docstrings
+wrap-summaries = 72
+wrap-descriptions = 72
+blank = true
