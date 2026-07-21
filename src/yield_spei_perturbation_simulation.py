@@ -334,12 +334,6 @@ def scale_perturb_yield(
 
     output_df = input_df.copy()
 
-    # drop first year if required
-    observed_yield_df = observed_yield_df[
-        observed_yield_df["year"].isin(output_df["year"])
-        ]
-    observed_yield_df = observed_yield_df.reset_index(drop=True)
-
     output_df = output_df.merge(observed_yield_df, on="year", how="left")
 
     if (output_df["yield_obs_t_ha"] < 0).any():
@@ -356,17 +350,28 @@ def scale_perturb_yield(
 
     simulated_yield_df = aggregate_yearly_yield(output_df, yield_threshold)
 
+    comparison_df = simulated_yield_df.merge(
+        observed_yield_df,
+        on="year",
+        how="left",
+    )
+
     # Scale simulated yield to observed yield
-    yearly_scale_factor = (
-        observed_yield_df["yield_obs_t_ha"]
-        / simulated_yield_df["yield_sim_t_ha"]
+    comparison_df["scale_factor"] = (
+        comparison_df["yield_obs_t_ha"]
+        / comparison_df["yield_sim_t_ha"]
     )
+
+    if comparison_df["year"].nunique() < output_df["year"].nunique():
+        print("Some year does not have any valid grids")
+        print("Grids in these years are assigned with zero yield")
     
-    n_season = output_df.groupby(["GID", "year"]).size().iloc[0]
-    output_df["scale_factor"] = np.tile(
-        yearly_scale_factor.repeat(n_season).reset_index(drop=True),
-        len(output_df["GID"].unique()),
+    output_df = output_df.merge(
+        comparison_df[["year", "scale_factor"]],
+        on="year",
+        how="left",
     )
+    output_df["scale_factor"] = output_df["scale_factor"].fillna(0)
 
     output_df["yield_scaled_t_ha"] = (
         output_df["scale_factor"]
