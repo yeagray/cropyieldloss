@@ -363,8 +363,10 @@ def scale_perturb_yield(
     )
 
     if comparison_df["year"].nunique() < output_df["year"].nunique():
-        print("Some year does not have any valid grids")
-        print("Grids in these years are assigned with zero yield")
+        print(
+            "Some year does not have any valid grids, "
+            "those grids are assigned with zero yield."
+        )
     
     output_df = output_df.merge(
         comparison_df[["year", "scale_factor"]],
