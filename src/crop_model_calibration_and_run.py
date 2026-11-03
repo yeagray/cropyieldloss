@@ -547,7 +547,7 @@ def simulate_country_yield(
 
 def summarize_productive_grids(
     df: pd.DataFrame,
-    yield_threshold: float = 0.1,
+    yield_threshold: float = 0.01,
 ) -> pd.DataFrame:
     """
     Calculate, for each year:
